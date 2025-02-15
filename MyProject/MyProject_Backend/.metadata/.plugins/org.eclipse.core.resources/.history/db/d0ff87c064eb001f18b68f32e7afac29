@@ -1,0 +1,188 @@
+package com.stayeasy.Services;
+
+import com.stayeasy.custom_exception.ResourceNotFoundException;
+import com.stayeasy.dao.BookingDao;
+import com.stayeasy.dao.HostelDao;
+import com.stayeasy.dao.RoomDao;
+import com.stayeasy.dao.UserDao;
+import com.stayeasy.dto.BookingDto;
+
+import com.stayeasy.dto.BookingResponseDto;
+import com.stayeasy.entity.Booking;
+import com.stayeasy.entity.BookingStatus;
+import com.stayeasy.entity.User;
+
+import jakarta.transaction.Transactional;
+
+import com.stayeasy.entity.Room;
+import com.stayeasy.entity.Hostel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class BookingService {
+    @Autowired
+    private BookingDao bookingRepository;
+    
+    @Autowired
+    private UserDao userRepository;
+    
+    @Autowired
+    private RoomDao roomRepository;
+    
+    @Autowired
+    private HostelDao hostelRepository;
+
+    public BookingResponseDto bookRoom(BookingDto bookingdetails ) {
+        Optional<User> userOpt = userRepository.findById(bookingdetails.getUser_id());
+        Optional<Room> roomOpt = roomRepository.findById(bookingdetails.getRoom_id());
+        Optional<Hostel> hostelOpt = hostelRepository.findById(bookingdetails.getHostel_id());
+
+        if (userOpt.isPresent() && roomOpt.isPresent() && hostelOpt.isPresent()) {
+            Booking booking = new Booking();
+            booking.setUser(userOpt.get());
+            booking.setRoom(roomOpt.get());
+            booking.setHostel(hostelOpt.get());
+            booking.setBookingDate(LocalDateTime.now());
+            booking.setCheckin(bookingdetails.getCheckin());
+            booking.setCheckout(bookingdetails.getCheckout());
+            booking.setStatus(BookingStatus.PENDING);
+            
+            try {
+                Booking b= bookingRepository.save(booking);
+               BookingResponseDto responsedto= new BookingResponseDto(
+                        b.getBooking_id(),
+                        b.getUser().getFirstName() + " " + booking.getUser().getLastName(),
+                        b.getBookingDate(),
+                        b.getCheckin(),
+                        b.getCheckout(),
+                        b.getStatus().name(), // Enum to String
+                        b.getRoom().getRoomnumber(),
+                        b.getHostel().getHostelname()
+                    );
+                return responsedto;
+            } catch (Exception e) {
+                throw new RuntimeException("Error saving booking: " + e.getMessage());
+            }
+        }
+        throw new RuntimeException("Invalid booking details");
+    }
+    
+    public List<BookingResponseDto> getAllBookingsOfUser(Long userId) {
+        List<Booking> bookings = bookingRepository.getbooking(userId);
+
+        return bookings.stream().map(booking -> 
+            new BookingResponseDto(
+                booking.getBooking_id(),
+                booking.getUser().getFirstName() + " " + booking.getUser().getLastName(),
+                booking.getBookingDate(),
+                booking.getCheckin(),
+                booking.getCheckout(),
+                booking.getStatus().name(), // Enum to String
+                booking.getRoom().getRoomnumber(),
+                booking.getHostel().getHostelname()
+            )
+        ).collect(Collectors.toList());
+    }
+    
+    public List<BookingResponseDto> getBookingsForHostel(Long HostelId){
+    	List<Booking> allbookings=bookingRepository.findByHostelId(HostelId);
+    	List<BookingResponseDto> alldtoresponse=allbookings.stream().map(booking-> 
+    	new BookingResponseDto(
+                booking.getBooking_id(),
+                booking.getUser().getFirstName() + " " + booking.getUser().getLastName(),
+                booking.getBookingDate(),
+                booking.getCheckin(),
+                booking.getCheckout(),
+                booking.getStatus().name(), // Enum to String
+                booking.getRoom().getRoomnumber(),
+                booking.getHostel().getHostelname()
+            )
+        ).collect(Collectors.toList());
+    	return alldtoresponse;
+    }
+    public String confirmBookingStatus(long bookingId) {
+        try {
+            int rowAffected = bookingRepository.confirmbooking(bookingId);
+            
+            if (rowAffected > 0) {
+                return "Updated successfully";
+            } else {
+                throw new ResourceNotFoundException("id not exist");
+            }
+        } catch (Exception e) {
+            return "Error updating status: " + e.getMessage();
+        }
+    }
+    public String cancelBookingStatus(long bookingId) {
+        try {
+            int rowAffected = bookingRepository.cancelbooking(bookingId);
+            if (rowAffected > 0) {
+                return "Updated successfully";
+            } else {
+                throw new ResourceNotFoundException("id not exist");
+            }
+        } catch (Exception e) {
+            return "Error updating status: " + e.getMessage();
+        }
+    }
+    
+}
+
+
+
+//package com.stayeasy.Services;
+//
+//import com.stayeasy.entity.Booking;
+//import com.stayeasy.entity.BookingStatus;
+//
+//import jakarta.transaction.Transactional;
+//
+//import com.stayeasy.dao.BookingDao;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//import java.time.LocalDateTime;
+//import java.util.List;
+//import java.util.Optional;
+//
+//@Service
+//@Transactional
+//public class BookingService {
+//
+//    @Autowired
+//    private BookingDao bookingDao;
+//
+//    public Booking createBooking(Booking booking) {
+//        booking.setBookingDate(LocalDateTime.now());
+//        booking.setStatus(BookingStatus.PENDING);
+//        return bookingDao.save(booking);
+//    }
+//
+//    public List<Booking> getAllBookings() {
+//        return bookingDao.findAll();
+//    }
+//
+//    public Optional<Booking> getBookingById(Long bookingId) {
+//        return bookingDao.findById(bookingId);
+//    }
+//
+//    public Booking updateBooking(Long bookingId, Booking updatedBooking) {
+//        return bookingDao.findById(bookingId).map(existingBooking -> {
+//            existingBooking.setCheckin(updatedBooking.getCheckin());
+//            existingBooking.setCheckout(updatedBooking.getCheckout());
+//            existingBooking.setStatus(updatedBooking.getStatus());
+//            return bookingDao.save(existingBooking);
+//        }).orElseThrow(() -> new RuntimeException("Booking not found with id: " + bookingId));
+//    }
+//
+//    
+//    public void deleteBooking(Long bookingId) {
+//        bookingDao.deleteById(bookingId);
+//    }
+//}

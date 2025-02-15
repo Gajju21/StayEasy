@@ -1,0 +1,20 @@
+package com.stayeasy.dao;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.stayeasy.entity.Booking;
+import com.stayeasy.entity.User;
+
+@Repository
+public interface BookingDao extends JpaRepository<Booking,Long>{
+	@Query(value="select b from booking b where b.user_id=:userId",nativeQuery=true)
+	public List<Booking> getbooking(@Param("userId")Long userId);
+
+
+}

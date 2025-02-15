@@ -1,0 +1,22 @@
+package com.stayeasy.Services;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.stayeasy.dao.RoomDao;
+import com.stayeasy.dto.RoomDTO;
+import com.stayeasy.entity.Room;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class RoomService {
+	@Autowired
+private RoomDao roomDao;
+	public List<RoomDTO> getllAllRoomsbyHostelid(long hosteId){
+		List<Room> allrooms=roomDao.findRoomsByHostelId(hosteId);
+	}
+}

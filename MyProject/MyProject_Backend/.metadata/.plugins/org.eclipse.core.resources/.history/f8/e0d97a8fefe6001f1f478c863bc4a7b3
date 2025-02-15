@@ -1,0 +1,16 @@
+package com.stayeasy.dto;
+
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+package com.stayeasy.dto;
+
+@Getter
+@Setter
+public class RegisterHostelDTO {
+    private String hostelName;
+    private String address;
+    private Long ownerId;
+    private RegisterHostelLocation location;
+    private List<RoomDTO> rooms;
+}

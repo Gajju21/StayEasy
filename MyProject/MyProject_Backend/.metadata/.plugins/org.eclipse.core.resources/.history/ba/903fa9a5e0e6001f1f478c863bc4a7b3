@@ -1,0 +1,69 @@
+package com.stayeasy.Services;
+
+import com.stayeasy.dao.HostelDao;
+import com.stayeasy.dao.UserDao;
+import com.stayeasy.dto.HostelDTO;
+import com.stayeasy.dto.RegisterHostelDTO;
+import com.stayeasy.dto.RoomDTO;
+import com.stayeasy.entity.Hostel;
+import com.stayeasy.entity.HostelLocation;
+import com.stayeasy.entity.Room;
+import com.stayeasy.entity.User;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84; 
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.builder.DSL;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class HostelService {
+	@Autowired
+    private final HostelDao hostelRepository;
+	@Autowired
+    private final UserDao userRepository;
+
+    public HostelService(HostelDao hostelRepository, UserDao userRepository) {
+        this.hostelRepository = hostelRepository;
+        this.userRepository = userRepository;
+    }
+
+    public Hostel registerHostel(RegisterHostelDTO hostelDTO) {
+        User owner = userRepository.findById(hostelDTO.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        // Convert DTO to Entity
+        Hostel hostel = new Hostel();
+        hostel.setHostelname(hostelDTO.getHostelName());
+        hostel.setAddress(hostelDTO.getAddress());
+        hostel.setOwner(owner);
+
+        // Save Location
+        HostelLocation location = new HostelLocation();
+        Point<G2D> point = DSL.point(WGS84, DSL.g(hostelDTO.getLocation().getLongitude(), hostelDTO.getLocation().getLatitude()));
+        location.setLocation(point);
+        hostel.setLocation(location);
+
+        // Save Rooms
+        List<Room> rooms = new ArrayList<>();
+        for (RoomDTO roomDTO : hostelDTO.getRooms()) {
+            Room room = new Room();
+            room.setRoomnumber(roomDTO.getRoomNumber());
+            room.setSharing(roomDTO.getSharing());
+            room.setPrice(roomDTO.getPrice());
+            room.setAvailable(roomDTO.isAvailable());
+            room.setHostel(hostel);
+            rooms.add(room);
+        }
+        hostel.setRooms(rooms);
+
+        return hostelRepository.save(hostel);
+    }
+
+    public List<Hostel> getAllHostels() {
+        return hostelRepository.findAll();
+    }
+}

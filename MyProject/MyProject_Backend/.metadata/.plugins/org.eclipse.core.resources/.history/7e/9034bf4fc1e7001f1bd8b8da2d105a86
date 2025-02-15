@@ -1,0 +1,25 @@
+package com.stayeasy.dto;
+
+import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookingResponse {
+	private Long booking_id;
+	private Long room_id;
+	
+	private Long hostel_id;
+
+	private Long user_id;
+	 private String hostelName;
+	private LocalDateTime checkin;
+	private  LocalDateTime checkout;
+	private String bookstatus; 
+		
+}

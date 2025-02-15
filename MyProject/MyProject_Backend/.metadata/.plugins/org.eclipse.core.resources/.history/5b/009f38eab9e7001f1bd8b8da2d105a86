@@ -1,0 +1,5 @@
+package com.stayeasy.controller;
+
+public class BookingController {
+
+}

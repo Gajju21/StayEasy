@@ -1,0 +1,11 @@
+package com.stayeasy.dto;
+import java.util.*;
+public class HostelResponseDTO {
+
+
+	    private Long ownerId;
+	    private String hostelName;
+	    private String address;
+	    private RegisterHostelLocationDTO location;
+	    private List<RoomDTO> rooms;
+}

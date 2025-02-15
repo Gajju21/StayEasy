@@ -1,0 +1,49 @@
+import com.stayeasy.entity.Booking;
+import com.stayeasy.Services.BookingService;
+import com.stayeasy.dto.BookingDto;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("api/bookings")
+public class BookingController {
+
+    @Autowired
+    private BookingService bookingService;
+
+    @PostMapping("/booking")
+    public ResponseEntity<Booking> createBooking(@RequestBody BookingDto bookingdto) {
+        Booking savedBooking = bookingService.bookRoom(bookingdto);
+        
+        return ResponseEntity.ok(savedBooking);
+    }
+
+    @GetMapping("/getuserbookings")
+    public ResponseEntity<List<Booking>> getAllBookingsbyuser(Long userId) {
+        return ResponseEntity.ok(bookingService.getallbookingofuser(userId));
+    }
+
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<Booking> getBookingById(@PathVariable Long bookingId) {
+        Optional<Booking> booking = bookingService.getBookingById(bookingId);
+        return booking.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+//    @PutMapping("/{bookingId}")
+//    public ResponseEntity<Booking> updateBooking(@PathVariable Long bookingId, @RequestBody Booking updatedBooking) {
+//        Booking booking = bookingService.updateBooking(bookingId, updatedBooking);
+//        return ResponseEntity.ok(booking);
+//    }
+
+//    @DeleteMapping("/{bookingId}")
+//    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId) {
+//        bookingService.deleteBooking(bookingId);
+//        return ResponseEntity.noContent().build();
+//    }
+}

@@ -1,0 +1,30 @@
+package com.stayeasy.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.maps.DirectionsApi.Response;
+import com.stayeasy.Services.RoomService;
+import com.stayeasy.dto.RoomDTO;
+
+import lombok.Getter;
+
+@RestController
+@RequestMapping("/api/rooms")
+public class RoomController {
+	@Autowired
+private RoomService roomService;
+
+@GetMapping("/{hostelId}")
+public List<RoomDTO> getallroomsbyhostelId(@PathVariable Long hostelId){
+	List<RoomDTO> allrooms=roomService.getllAllRoomsbyHostelid(hostelId);
+	return allrooms;
+}
+
+}

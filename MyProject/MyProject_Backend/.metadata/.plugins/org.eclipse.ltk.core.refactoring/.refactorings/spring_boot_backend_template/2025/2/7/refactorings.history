@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;com.stayeasy.dto.BookingResponse.java&apos; to &apos;BookingResponseDto.java&apos;&#x0D;&#x0A;- Original project: &apos;spring_boot_backend_template&apos;&#x0D;&#x0A;- Original element: &apos;com.stayeasy.dto.BookingResponse.java&apos;&#x0D;&#x0A;- Renamed element: &apos;com.stayeasy.dto.BookingResponseDto.java&apos;" description="Rename compilation unit &apos;BookingResponse.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.stayeasy.dto{BookingResponse.java" name="BookingResponseDto.java" references="false" stamp="1739200293101" version="1.0"/>
+</session>

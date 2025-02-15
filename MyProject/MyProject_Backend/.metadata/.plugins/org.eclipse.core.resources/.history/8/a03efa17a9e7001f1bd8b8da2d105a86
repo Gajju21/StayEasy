@@ -1,0 +1,5 @@
+package com.stayeasy.Services;
+
+public class RoomService {
+
+}

@@ -1,0 +1,17 @@
+1737979915343	Rename package 'com.blogs'
+1737979947164	Rename package 'com.blogs.controller'
+1738038473776	Rename type 'Userdao'
+1738038488800	Rename type 'Recorddao'
+1738038500466	Rename type 'Hosteldao'
+1738039278965	Rename type 'TestController'
+1738146720248	Rename type 'HsotelController'
+1738148078703	Delete element
+1738148084009	Delete element
+1738148088293	Delete element
+1738148091572	Delete element
+1738148094880	Delete element
+1738148097627	Delete element
+1738148328284	Rename package 'com.stayeasy.pojo'
+1738243421753	Rename compilation unit 'GeoHashUtils.java'
+1738260135521	Delete element
+1738298674141	Rename compilation unit 'UserDto.java'

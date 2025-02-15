@@ -1,0 +1,93 @@
+package com.stayeasy.Services;
+
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.builder.DSL;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.stayeasy.dao.HostelDao;
+import com.stayeasy.dao.HostelLocationDao;
+import com.stayeasy.dao.RoomDao;
+import com.stayeasy.dao.UserDao;
+import com.stayeasy.dto.RegisterHostelDTO;
+import com.stayeasy.dto.RoomDTO;
+import com.stayeasy.entity.Hostel;
+import com.stayeasy.entity.HostelLocation;
+import com.stayeasy.entity.Room;
+import com.stayeasy.entity.User;
+
+@Service
+@Transactional
+public class HostelService {
+
+    private final HostelDao hostelRepository;
+    private final UserDao userRepository;
+    private final HostelLocationDao hostellocationdao;
+    private final RoomDao roomdao;
+
+    public HostelService(HostelDao hostelRepository, UserDao userRepository,
+                         HostelLocationDao hostellocationdao, RoomDao roomdao) {
+        this.hostelRepository = hostelRepository;
+        this.userRepository = userRepository;
+        this.hostellocationdao = hostellocationdao;
+        this.roomdao = roomdao;
+    }
+
+    @Transactional  // Ensures atomicity of DB operations ✅
+    public Hostel registerHostel(RegisterHostelDTO hostelDTO) {
+        User owner = userRepository.findById(hostelDTO.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+
+        // Validate Location DTO
+        if (hostelDTO.getLocation() == null) {
+            throw new RuntimeException("Hostel location cannot be null");
+        }
+
+        // Create and Save Location First
+        HostelLocation location = new HostelLocation();
+        Point<G2D> point = DSL.point(WGS84, DSL.g(
+                hostelDTO.getLocation().getLongitude(),
+                hostelDTO.getLocation().getLatitude()
+        ));
+        location.setLocation(point);
+        location = hostellocationdao.save(location);  // Persist location ✅
+
+        // Create Hostel Entity
+        Hostel hostel = new Hostel();
+        hostel.setHostelname(hostelDTO.getHostelName());
+        hostel.setAddress(hostelDTO.getAddress());
+        hostel.setOwner(owner);
+        hostel.setLocation(location);  // Assign saved location ✅
+
+        hostel = hostelRepository.save(hostel);  // Save Hostel next ✅
+
+        // Save Rooms after Hostel is saved
+        List<Room> rooms = new ArrayList<>();
+        for (RoomDTO roomDTO : hostelDTO.getRooms()) {
+            Room room = new Room();
+            room.setRoomnumber(roomDTO.getRoomNumber());
+            room.setSharing(roomDTO.getSharing());
+            room.setPrice(roomDTO.getPrice());
+            room.setAvailable(roomDTO.isAvailable());
+            room.setHostel(hostel);  // Assign saved Hostel ✅
+            rooms.add(room);
+        }
+
+        if (!rooms.isEmpty()) {
+            roomdao.saveAll(rooms);  // Save Rooms ✅
+        }
+
+        return hostel;
+    }
+
+
+
+    public List<Hostel> getAllHostels() {
+        return hostelRepository.findAll();
+    }
+}

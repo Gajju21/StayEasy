@@ -1,0 +1,69 @@
+package com.stayeasy.entity;
+
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name="Hostel")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class Hostel {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+private Long hostel_id;
+	
+	@ManyToOne
+    @JoinColumn(name = "owner_id",nullable=false) // Foreign key column in the hostel table
+	private User owner;
+	
+private String hostelname;
+private String address;
+
+
+
+@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+@JoinColumn(name = "location_id", referencedColumnName = "hostel_location_id")
+private HostelLocation location; // Fixed hostel location
+
+@OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL,orphanRemoval = true ,fetch = FetchType.EAGER)
+private List<Room> rooms;
+
+//public void addroom(Room room) {
+//	this.rooms.add(room);
+//	room.setHostel(this);
+//}
+//public void removeroom(Room room) {
+//	rooms.remove(room);
+//	room.setHostel(this);
+//}
+//@OneToMany(mappedBy = "hostel",cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+//private List<Booking> bookings;
+
+//@OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//private List<Review> reviews;
+
+//@OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//private List<Record> records;
+
+//@OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//private List<User> users;
+
+
+}

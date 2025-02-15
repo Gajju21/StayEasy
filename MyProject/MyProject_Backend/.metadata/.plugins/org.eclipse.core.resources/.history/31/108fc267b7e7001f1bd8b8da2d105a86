@@ -1,0 +1,112 @@
+package com.stayeasy.Services;
+
+import com.stayeasy.dao.BookingDao;
+import com.stayeasy.dao.HostelDao;
+import com.stayeasy.dao.RoomDao;
+import com.stayeasy.dao.UserDao;
+import com.stayeasy.dto.BookingDto;
+import com.stayeasy.entity.Booking;
+import com.stayeasy.entity.BookingStatus;
+import com.stayeasy.entity.User;
+
+import jakarta.transaction.Transactional;
+
+import com.stayeasy.entity.Room;
+import com.stayeasy.entity.Hostel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Service
+@Transactional
+public class BookingService {
+    @Autowired
+    private BookingDao bookingRepository;
+    
+    @Autowired
+    private UserDao userRepository;
+    
+    @Autowired
+    private RoomDao roomRepository;
+    
+    @Autowired
+    private HostelDao hostelRepository;
+
+    public Booking bookRoom(BookingDto bookingdetails ) {
+        Optional<User> userOpt = userRepository.findById(bookingdetails.getUser_id());
+        Optional<Room> roomOpt = roomRepository.findById(bookingdetails.getRoom_id());
+        Optional<Hostel> hostelOpt = hostelRepository.findById(bookingdetails.getHostel_id());
+
+        if (userOpt.isPresent() && roomOpt.isPresent() && hostelOpt.isPresent()) {
+            Booking booking = new Booking();
+            booking.setUser(userOpt.get());
+            booking.setRoom(roomOpt.get());
+            booking.setHostel(hostelOpt.get());
+            booking.setBookingDate(LocalDateTime.now());
+            booking.setCheckin(bookingdetails.getCheckin());
+            booking.setCheckout(bookingdetails.getCheckout());
+            booking.setStatus(BookingStatus.PENDING);
+            
+            try {
+                return bookingRepository.save(booking);
+            } catch (Exception e) {
+                throw new RuntimeException("Error saving booking: " + e.getMessage());
+            }
+        }
+        throw new RuntimeException("Invalid booking details");
+    }
+}
+
+
+
+//package com.stayeasy.Services;
+//
+//import com.stayeasy.entity.Booking;
+//import com.stayeasy.entity.BookingStatus;
+//
+//import jakarta.transaction.Transactional;
+//
+//import com.stayeasy.dao.BookingDao;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//import java.time.LocalDateTime;
+//import java.util.List;
+//import java.util.Optional;
+//
+//@Service
+//@Transactional
+//public class BookingService {
+//
+//    @Autowired
+//    private BookingDao bookingDao;
+//
+//    public Booking createBooking(Booking booking) {
+//        booking.setBookingDate(LocalDateTime.now());
+//        booking.setStatus(BookingStatus.PENDING);
+//        return bookingDao.save(booking);
+//    }
+//
+//    public List<Booking> getAllBookings() {
+//        return bookingDao.findAll();
+//    }
+//
+//    public Optional<Booking> getBookingById(Long bookingId) {
+//        return bookingDao.findById(bookingId);
+//    }
+//
+//    public Booking updateBooking(Long bookingId, Booking updatedBooking) {
+//        return bookingDao.findById(bookingId).map(existingBooking -> {
+//            existingBooking.setCheckin(updatedBooking.getCheckin());
+//            existingBooking.setCheckout(updatedBooking.getCheckout());
+//            existingBooking.setStatus(updatedBooking.getStatus());
+//            return bookingDao.save(existingBooking);
+//        }).orElseThrow(() -> new RuntimeException("Booking not found with id: " + bookingId));
+//    }
+//
+//    
+//    public void deleteBooking(Long bookingId) {
+//        bookingDao.deleteById(bookingId);
+//    }
+//}

@@ -1,0 +1,5 @@
+package com.stayeasy.dto;
+
+public class HostelResponseDTO {
+
+}

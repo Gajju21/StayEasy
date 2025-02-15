@@ -1,0 +1,13 @@
+package com.stayeasy.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class RoomDTO {
+    private String roomNumber;
+    private int sharing;
+    private double price;
+    private boolean available;
+}
